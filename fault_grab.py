@@ -130,7 +130,7 @@ class fault_grab():
                 self.grab_start = 1
                 self.arm_move(self.p_top, 1000)
                 self.arm_move(pick_pose, 1000)
-                time.sleep(5)
+                time.sleep(0.5)
                 self.arm_clamp_block(1)
                 self.arm_move(self.p_top, 1000)
                 self.put_down_block()
@@ -145,7 +145,7 @@ class fault_grab():
                 else :    
                     obj_angle = 270 - (90 - obj_angle)
                 self.arm_clamp_move(obj_angle)
-                time.sleep(5)
+                time.sleep(0.5)
                 self.arm_clamp_block(1)
                 self.arm_move(self.p_top, 1000)
                 self.put_down_block()

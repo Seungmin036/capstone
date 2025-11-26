@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import time, threading, curses
 from Arm_Lib import Arm_Device
 
@@ -9,19 +7,14 @@ def clamp(v, lo=MIN_ANGLE, hi=MAX_ANGLE):
     return max(lo, min(hi, v))
 
 def read_feedback_loop(Arm, angles_fb, stop_evt, period=0.05):
-    """
-    주기적으로 6개 서보 각도 읽어서 angles_fb[:] 갱신
-    period=0.05 → 약 20Hz. 느리면 0.1로 올려.
-    """
     while not stop_evt.is_set():
         try:
             for i in range(6):
-                val = Arm.Arm_serial_servo_read(i+1)  # 라이브러리의 read 함수
-                # 읽기 실패 시 None을 돌리는 구현도 있으니 예외처리
+                val = Arm.Arm_serial_servo_read(i+1)  
                 if val is None:
                     continue
                 angles_fb[i] = int(round(val))
-                time.sleep(0.005)  # 버스에 여유
+                time.sleep(0.005)
         except Exception:
             pass
         time.sleep(max(0.0, period - 6*0.005))
@@ -34,17 +27,16 @@ def main(stdscr):
     Arm = Arm_Device()
     time.sleep(0.1)
 
-    # 명령/피드백 각도
     angles_cmd = [90]*6
     angles_fb  = [90]*6
     step_deg   = 1
     move_time  = 500
 
-    # 초기자세
+    # init position
     Arm.Arm_serial_servo_write6(*angles_cmd, move_time)
     time.sleep(0.6)
 
-    # 피드백 스레드 시작
+    # feedback thread start
     stop_evt = threading.Event()
     t_fb = threading.Thread(target=read_feedback_loop, args=(Arm, angles_fb, stop_evt, 0.05), daemon=True)
     t_fb.start()
@@ -107,9 +99,7 @@ def main(stdscr):
                 if moved:
                     last_move_ts = time.time()
 
-            # 0.3초 이상 입력이 없으면, 피드백을 명령 기준선으로 동기화(수동으로 움직인 걸 내부 상태에 반영)
             if time.time() - last_move_ts > 0.3:
-                # 각 축이 많이 벌어졌으면 서서히 따라가도 됨. 여기선 즉시 스냅.
                 angles_cmd[:] = [int(x) for x in angles_fb]
 
             draw()

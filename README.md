@@ -18,3 +18,6 @@
     : used for color calibration
 4. arm_handle.py
     : manual teaching mode
+
+## Videos
+https://www.notion.so/2b665c2d8a4a80398870ec78837bbaf8?source=copy_link
